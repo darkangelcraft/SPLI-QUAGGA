@@ -13,13 +13,22 @@ import os
 file = open("configured.txt", "r")
 configured = file.read()
 
-#print 'Name wireless interface:'
-wlan = "en1"  # <- - - - - - - - - - - - - - -  [MODIFICARE INTERFACCIA WIFI]
+file2 = open("interface.txt", "r")
+interface = file.read()
 
+print '0) set wlan_interface'
 print '1) start'
 print '2) reset'
 start = raw_input()
-if not start == '1':
+
+if str(interface) == "null":
+    print "insert name your interface:"
+    wlan_interface=raw_input()
+    wlan=wlan_interface
+    file2 = open("interface.txt", "w")
+    file2.write(str(wlan_interface))
+
+elif not start == '1':
     print '****************** reset configuration *************************'
     file = open("configured.txt", "w")
     file.write("null")
@@ -43,10 +52,11 @@ if not start == '1':
 #     print os.system('iwconfig | grep ' + wlan)
 #     print '- - - - - - - - - - - - - - - - - - - - - - - - - - -'
 
-#########################################################################################################
+########################################################################################################
 
 #non sono configurato
 if str(configured) == "null":
+
     print '\nconfiguration:'
 
     print '1) router1 (192.168.1.1 - 1.1.1.1 - 3.3.3.1)'
@@ -90,17 +100,21 @@ if str(configured) == "null":
         os.system('sudo sysctl -w net.ipv4.conf.default.accept_redirects=0')
         os.system('sudo sysctl -w net.ipv4.conf.default.send_redirects=0')
 
+        #general wlan
+        os.system('sudo sysctl -w net.ipv4.conf.' + wlan + '.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.' + wlan + '.send_redirects=0')
+
         # dev wlan:1
-        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':1.accept_redirects=0')
-        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':1.send_redirects=0')
+        #os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':1.accept_redirects=0')
+        #os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':1.send_redirects=0')
 
         # dev wlan:2
-        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':2.accept_redirects=0')
-        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':2.send_redirects=0')
+        #os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':2.accept_redirects=0')
+        #os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':2.send_redirects=0')
 
         # dev wlan:3
-        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':3.accept_redirects=0')
-        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':3.send_redirects=0')
+        #os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':3.accept_redirects=0')
+        #os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':3.send_redirects=0')
 
         # lo
         os.system('sudo sysctl -w net.ipv4.conf.lo.accept_redirects=0')
