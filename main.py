@@ -21,10 +21,9 @@ print '1) start'
 print '2) reset'
 start = raw_input()
 
-if str(interface) == "null":
+if start == '0':
     print "insert name your interface:"
     wlan_interface=raw_input()
-    wlan=wlan_interface
     file2 = open("interface.txt", "w")
     file2.write(str(wlan_interface))
 
@@ -32,6 +31,8 @@ elif not start == '1':
     print '****************** reset configuration *************************'
     file = open("configured.txt", "w")
     file.write("null")
+    file2 = open("interface.txt", "w")
+    file2.write("null")
     sys.exit(0)
 
 # #il mio indirizzo IP
@@ -56,6 +57,9 @@ elif not start == '1':
 
 #non sono configurato
 if str(configured) == "null":
+
+    file2=open("interface.txt", "r")
+    wlan = file2.read()
 
     print '\nconfiguration:'
 
@@ -155,17 +159,21 @@ if str(configured) == "null":
         os.system('sudo sysctl -w net.ipv4.conf.default.accept_redirects=0')
         os.system('sudo sysctl -w net.ipv4.conf.default.send_redirects=0')
 
+        # general wlan
+        os.system('sudo sysctl -w net.ipv4.conf.' + wlan + '.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.' + wlan + '.send_redirects=0')
+
         # dev wlan:1
-        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':1.accept_redirects=0')
-        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':1.send_redirects=0')
+        #os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':1.accept_redirects=0')
+        #os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':1.send_redirects=0')
 
         # dev wlan:2
-        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':2.accept_redirects=0')
-        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':2.send_redirects=0')
+        #os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':2.accept_redirects=0')
+        #os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':2.send_redirects=0')
 
         # dev wlan:3
-        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':3.accept_redirects=0')
-        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':3.send_redirects=0')
+        #os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':3.accept_redirects=0')
+        #os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':3.send_redirects=0')
 
         # lo
         os.system('sudo sysctl -w net.ipv4.conf.lo.accept_redirects=0')
@@ -205,13 +213,17 @@ if str(configured) == "null":
         os.system('sudo sysctl -w net.ipv4.conf.default.accept_redirects=0')
         os.system('sudo sysctl -w net.ipv4.conf.default.send_redirects=0')
 
+        # general wlan
+        os.system('sudo sysctl -w net.ipv4.conf.' + wlan + '.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.' + wlan + '.send_redirects=0')
+
         # dev wlan:1
-        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':1.accept_redirects=0')
-        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':1.send_redirects=0')
+        #os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':1.accept_redirects=0')
+        #os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':1.send_redirects=0')
 
         # dev wlan:2
-        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':2.accept_redirects=0')
-        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':2.send_redirects=0')
+        #os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':2.accept_redirects=0')
+        #os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':2.send_redirects=0')
 
         # lo
         os.system('sudo sysctl -w net.ipv4.conf.lo.accept_redirects=0')
@@ -294,6 +306,8 @@ if str(configured) == "null":
         print '****************** reset configuration *************************'
         file = open("configured.txt", "w")
         file.write("null")
+        file2 = open("interface.txt", "w")
+        file2.write("null")
         sys.exit(0)
 
 #########################################################################################################
@@ -322,6 +336,8 @@ else:
                 print '****************** reset configuration *************************'
                 file = open("configured.txt", "w")
                 file.write("null")
+                file2 = open("interface.txt", "w")
+                file2.write("null")
                 sys.exit(0)
 
             int_option = None
@@ -345,6 +361,8 @@ else:
                 print '****************** reset configuration *************************'
                 file = open("configured.txt", "w")
                 file.write("null")
+                file2 = open("interface.txt", "w")
+                file2.write("null")
                 sys.exit(0)
 
 
