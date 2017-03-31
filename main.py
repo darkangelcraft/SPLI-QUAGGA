@@ -4,7 +4,7 @@
 
 import sys
 import os
-import netifaces as ni
+#import netifaces as ni
 
 #########################################################################################################
 
