@@ -14,7 +14,7 @@ file = open("configured.txt", "r")
 configured = file.read()
 
 #print 'Name wireless interface:'
-wlan = "wlp2s0b1"  # <- - - - - - - - - - - - - - -  [MODIFICARE INTERFACCIA WIFI]
+wlan = "en1"  # <- - - - - - - - - - - - - - -  [MODIFICARE INTERFACCIA WIFI]
 
 print '1) start'
 print '2) reset'
@@ -25,23 +25,23 @@ if not start == '1':
     file.write("null")
     sys.exit(0)
 
-#il mio indirizzo IP
-#prima configurazione oppure sono sia client,server o superclient
-if str(configured) == "null" or str(configured) == "client" or str(configured) == "superclient" or str(configured) == "server":
-    ni.ifaddresses(wlan)
-    myIP = ni.ifaddresses(wlan)[2][0]['addr']
-    print '- - - - - - - - - - '+myIP+' - - - - - - - - - - - \n'
-
-    print os.system('iwconfig | grep '+wlan)
-    print '- - - - - - - - - - - - - - - - - - - - - - - - - -'
-#sono un gateway
-else:
-    ni.ifaddresses(wlan)
-    myIP = ni.ifaddresses(wlan+':1')[2][0]['addr']
-    print '- - - - - - - - - - ' + myIP + ' - - - - - - - - - - - \n'
-
-    print os.system('iwconfig | grep ' + wlan)
-    print '- - - - - - - - - - - - - - - - - - - - - - - - - - -'
+# #il mio indirizzo IP
+# #prima configurazione oppure sono sia client,server o superclient
+# if str(configured) == "null" or str(configured) == "client" or str(configured) == "superclient" or str(configured) == "server":
+#     ni.ifaddresses(wlan)
+#     myIP = ni.ifaddresses(wlan)[2][0]['addr']
+#     print '- - - - - - - - - - '+myIP+' - - - - - - - - - - - \n'
+#
+#     print os.system('iwconfig | grep '+wlan)
+#     print '- - - - - - - - - - - - - - - - - - - - - - - - - -'
+# #sono un gateway
+# else:
+#     ni.ifaddresses(wlan)
+#     myIP = ni.ifaddresses(wlan+':1')[2][0]['addr']
+#     print '- - - - - - - - - - ' + myIP + ' - - - - - - - - - - - \n'
+#
+#     print os.system('iwconfig | grep ' + wlan)
+#     print '- - - - - - - - - - - - - - - - - - - - - - - - - - -'
 
 #########################################################################################################
 
@@ -54,6 +54,9 @@ if str(configured) == "null":
     print '3) router3 (3.3.3.2 - 2.2.2.2)'
     print '4) hostA (192.168.1.100)'
     print '5) hostB (192.168.0.100)'
+
+    print '\n6) quagga OFF'
+    print '7) quagga ON'
 
     print '\nchoose configuration:'
     option = raw_input()
@@ -211,7 +214,10 @@ if str(configured) == "null":
     elif option == '4':
         os.system('ifconfig ' + wlan + ' 192.168.1.100/24')
         os.system('route del default')
-        os.system('route add default gw 192.168.1.100')
+        os.system('route add default gw 192.168.1.1')
+
+        # disabilitare il forwarding dei pacchetti
+        os.system('sudo sysctl -w net.ipv4.ip_forward=0')
 
         # disabilita ICMP redirect
         os.system('sudo sysctl -w net.ipv4.conf.all.accept_redirects=0')
@@ -239,6 +245,9 @@ if str(configured) == "null":
         os.system('route del default')
         os.system('route add default gw 192.168.0.1')
 
+        # disabilitare il forwarding dei pacchetti
+        os.system('sudo sysctl -w net.ipv4.ip_forward=0')
+
         # disabilita ICMP redirect
         os.system('sudo sysctl -w net.ipv4.conf.all.accept_redirects=0')
         os.system('sudo sysctl -w net.ipv4.conf.all.send_redirects=0')
@@ -258,6 +267,14 @@ if str(configured) == "null":
         print 'hostB!'
         file = open("configured.txt", "w")
         file.write("host")
+
+    elif option == '6':
+        os.system("sudo /etc/init.d/quagga stop")
+        print "quagga service STOP!"
+
+    elif option == '7':
+        os.system("sudo /etc/init.d/quagga restart")
+        print "quagga service START!"
 
     else:
         print '****************** reset configuration *************************'
