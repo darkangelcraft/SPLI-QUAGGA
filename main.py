@@ -1,6 +1,6 @@
 # e necessario far partire il programma dal terminale con i seguenti comandi:
 # sudo python main.py
-# cosi facendo si hanno i permessi di root
+#cosi facendo si hanno i permessi di root
 
 import sys
 import os
@@ -8,13 +8,13 @@ import netifaces as ni
 
 #########################################################################################################
 
-# variabile statica globale presente all interno del file configured.txt che
+#variabile statica globale presente all interno del file configured.txt che
 # in base al valore capisco se non e configurato, e un host o e un gateway
 file = open("configured.txt", "r")
 configured = file.read()
 
-# print 'Name wireless interface:'
-wlan = "en1"  # <- - - - - - - - - - - - - - -  [MODIFICARE INTERFACCIA WIFI]
+#print 'Name wireless interface:'
+wlan = "wlp2s0b1"  # <- - - - - - - - - - - - - - -  [MODIFICARE INTERFACCIA WIFI]
 
 print '1) start'
 print '2) reset'
@@ -25,55 +25,56 @@ if not start == '1':
     file.write("null")
     sys.exit(0)
 
-# il mio indirizzo IP
-# prima configurazione oppure sono sia client,server o superclient
-if str(configured) == "null" or str(configured) == "client" or str(configured) == "superclient" or str(
-        configured) == "server":
+#il mio indirizzo IP
+#prima configurazione oppure sono sia client,server o superclient
+if str(configured) == "null" or str(configured) == "client" or str(configured) == "superclient" or str(configured) == "server":
     ni.ifaddresses(wlan)
     myIP = ni.ifaddresses(wlan)[2][0]['addr']
-    print '- - - - - - - - - - ' + myIP + ' - - - - - - - - - - - - -\n'
+    print '- - - - - - - - - - '+myIP+' - - - - - - - - - - - \n'
 
-    print os.system('iwconfig | grep ' + wlan)
-    print '- - - - - - - - - - - - - - - - - - - - - - - - - - - -'
-# sono un gateway
+    print os.system('iwconfig | grep '+wlan)
+    print '- - - - - - - - - - - - - - - - - - - - - - - - - -'
+#sono un gateway
 else:
     ni.ifaddresses(wlan)
-    myIP = ni.ifaddresses(wlan + ':1')[2][0]['addr']
+    myIP = ni.ifaddresses(wlan+':1')[2][0]['addr']
     print '- - - - - - - - - - ' + myIP + ' - - - - - - - - - - - \n'
 
     print os.system('iwconfig | grep ' + wlan)
-    print '- - - - - - - - - - - - - - - - - - - - - - - - - - - -'
+    print '- - - - - - - - - - - - - - - - - - - - - - - - - - -'
 
 #########################################################################################################
 
-# non sono configurato
+#non sono configurato
 if str(configured) == "null":
     print '\nconfiguration:'
 
-    print '0) gateway'
-    print '1) super-client (network 1) 172.30.1.2'
-    print '2) client (network 1) 172.30.1.3'
-    print '3) client (network 1) 173.30.1.4'
-    print '4) server (network 2) 172.30.2.2'
+    print '1) router1 (192.168.1.1 - 1.1.1.1 - 3.3.3.1)'
+    print '2) router2 (192.168.0.1 - 1.1.1.2 - 2.2.2.1)'
+    print '3) router3 (3.3.3.2 - 2.2.2.2)'
+    print '4) hostA (192.168.1.100)'
+    print '5) hostB (192.168.0.100)'
 
     print '\nchoose configuration:'
     option = raw_input()
 
     # prima configurazione
 
-    # CONFIGURAZIONE GATEWAY
-    if option == '0':
+    # CONFIGURAZIONE ROUTER1
+    if option == '1':
         option = None
-        # impostazione indirizzi IP
-        os.system('sudo ifconfig -v ' + wlan + ':1 172.30.1.1/24')
-        os.system('sudo ifconfig -v ' + wlan + ':2 172.30.2.1/24')
+        #impostazione indirizzi IP
+        os.system('sudo ifconfig -v '+wlan+':1 192.168.1.1/24')
+        os.system('sudo ifconfig -v '+wlan+':2 1.1.1.1/24')
+        os.system('sudo ifconfig -v '+wlan+':3 3.3.3.1/24')
 
         # cancella le route di default
         os.system('sudo route del default')
 
         # aggiunge route per vedere le reti
-        os.system('sudo route add -net 172.30.1.0 netmask 255.255.255.0 gw 172.30.1.1 dev ' + wlan + ':1')
-        os.system('sudo route add -net 172.30.2.0 netmask 255.255.255.0 gw 172.30.2.1 dev ' + wlan + ':2')
+        os.system('sudo route add -net 192.168.1.0 netmask 255.255.255.0 gw 192.168.1.1 dev '+wlan+':1')
+        os.system('sudo route add -net 1.1.1.0 netmask 255.255.255.0 gw 1.1.1.1 dev '+wlan+':2')
+        os.system('sudo route add -net 3.3.3.0 netmask 255.255.255.0 gw 3.3.3.1 dev '+wlan+':3')
 
         # abilitare il forwarding dei pacchetti
         os.system('sudo sysctl -w net.ipv4.ip_forward=1')
@@ -86,56 +87,178 @@ if str(configured) == "null":
         os.system('sudo sysctl -w net.ipv4.conf.default.accept_redirects=0')
         os.system('sudo sysctl -w net.ipv4.conf.default.send_redirects=0')
 
-        # dev wlan
-        os.system('sudo sysctl -w net.ipv4.conf.' + wlan + '.accept_redirects=0')
-        os.system('sudo sysctl -w net.ipv4.conf.' + wlan + '.send_redirects=0')
+        # dev wlan:1
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':1.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':1.send_redirects=0')
+
+        # dev wlan:2
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':2.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':2.send_redirects=0')
+
+        # dev wlan:3
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':3.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':3.send_redirects=0')
 
         # lo
         os.system('sudo sysctl -w net.ipv4.conf.lo.accept_redirects=0')
         os.system('sudo sysctl -w net.ipv4.conf.lo.send_redirects=0')
 
-        print 'gateway configured!'
+        # riavvio quagga
+        os.system('sudo /etc/init.d/quagga restart')
+
+        print 'router1 configured!'
         file = open("configured.txt", "w")
-        file.write("gateway")
+        file.write("router")
 
-    # CONFIGURAZIONE SUPER-CLIENT
-    elif option == '1':
-        os.system('ifconfig ' + wlan + ' 172.30.1.2/24')
-        os.system('route del default')
-        os.system('route add default gw 172.30.1.1')
 
-        print 'super-client configured!'
-        file = open("configured.txt", "w")
-        file.write("superclient")
-
-    # CONFIGURAZIONE ALTRI CLIENT
+    # CONFIGURAZIONE ROUTER2
     elif option == '2':
-        os.system('ifconfig ' + wlan + ' 172.30.1.3/24')
-        os.system('route del default')
-        os.system('route add default gw 172.30.1.1')
+        option = None
+        #impostazione indirizzi IP
+        os.system('sudo ifconfig -v '+wlan+':1 192.168.0.1/24')
+        os.system('sudo ifconfig -v '+wlan+':2 1.1.1.2/24')
+        os.system('sudo ifconfig -v '+wlan+':3 2.2.2.1/24')
 
-        print 'normal client configured!'
+        # cancella le route di default
+        os.system('sudo route del default')
+
+        # aggiunge route per vedere le reti
+        os.system('sudo route add -net 192.168.0.0 netmask 255.255.255.0 gw 192.168.0.1 dev '+wlan+':1')
+        os.system('sudo route add -net 1.1.1.0 netmask 255.255.255.0 gw 1.1.1.2 dev '+wlan+':2')
+        os.system('sudo route add -net 2.2.2.0 netmask 255.255.255.0 gw 2.2.2.1 dev '+wlan+':3')
+
+        # abilitare il forwarding dei pacchetti
+        os.system('sudo sysctl -w net.ipv4.ip_forward=1')
+
+        # disabilita ICMP redirect
+        os.system('sudo sysctl -w net.ipv4.conf.all.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.all.send_redirects=0')
+
+        # default
+        os.system('sudo sysctl -w net.ipv4.conf.default.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.default.send_redirects=0')
+
+        # dev wlan:1
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':1.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':1.send_redirects=0')
+
+        # dev wlan:2
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':2.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':2.send_redirects=0')
+
+        # dev wlan:3
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':3.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':3.send_redirects=0')
+
+        # lo
+        os.system('sudo sysctl -w net.ipv4.conf.lo.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.lo.send_redirects=0')
+
+        # riavvio quagga
+        os.system('sudo /etc/init.d/quagga restart')
+
+        print 'router2 configured!'
         file = open("configured.txt", "w")
-        file.write("client")
+        file.write("router")
 
+
+
+    # CONFIGURAZIONE ROUTER2
     elif option == '3':
-        os.system('ifconfig ' + wlan + ' 172.30.1.4/24')
-        os.system('route del default')
-        os.system('route add default gw 172.30.1.1')
+        option = None
+        #impostazione indirizzi IP
+        os.system('sudo ifconfig -v '+wlan+':1 3.3.3.2/24')
+        os.system('sudo ifconfig -v '+wlan+':2 2.2.2.2/24')
 
-        print 'normal client configured!'
+        # cancella le route di default
+        os.system('sudo route del default')
+
+        # aggiunge route per vedere le reti
+        os.system('sudo route add -net 3.3.3.0 netmask 255.255.255.0 gw 3.3.3.2 dev '+wlan+':1')
+        os.system('sudo route add -net 2.2.2.0 netmask 255.255.255.0 gw 2.2.2.2 dev '+wlan+':2')
+
+        # abilitare il forwarding dei pacchetti
+        os.system('sudo sysctl -w net.ipv4.ip_forward=1')
+
+        # disabilita ICMP redirect
+        os.system('sudo sysctl -w net.ipv4.conf.all.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.all.send_redirects=0')
+
+        # default
+        os.system('sudo sysctl -w net.ipv4.conf.default.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.default.send_redirects=0')
+
+        # dev wlan:1
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':1.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':1.send_redirects=0')
+
+        # dev wlan:2
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':2.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+':2.send_redirects=0')
+
+        # lo
+        os.system('sudo sysctl -w net.ipv4.conf.lo.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.lo.send_redirects=0')
+
+        # riavvio quagga
+        os.system('sudo /etc/init.d/quagga restart')
+
+        print 'router3 configured!'
         file = open("configured.txt", "w")
-        file.write("client")
+        file.write("router")
 
-    # CONFIGURAZIONE SERVER
+    # hostA
     elif option == '4':
-        os.system('ifconfig ' + wlan + ' 172.30.2.2/24')
+        os.system('ifconfig ' + wlan + ' 192.168.1.100/24')
         os.system('route del default')
-        os.system('route add default gw 172.30.2.1')
+        os.system('route add default gw 192.168.1.100')
 
-        print 'server configured!'
+        # disabilita ICMP redirect
+        os.system('sudo sysctl -w net.ipv4.conf.all.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.all.send_redirects=0')
+
+        # default
+        os.system('sudo sysctl -w net.ipv4.conf.default.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.default.send_redirects=0')
+
+        # dev wlan
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+'.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+'.send_redirects=0')
+
+        # lo
+        os.system('sudo sysctl -w net.ipv4.conf.lo.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.lo.send_redirects=0')
+
+        print 'hostA!'
         file = open("configured.txt", "w")
-        file.write("server")
+        file.write("host")
+
+    # hostB
+    elif option == '5':
+        os.system('ifconfig ' + wlan + ' 192.168.0.100/24')
+        os.system('route del default')
+        os.system('route add default gw 192.168.0.1')
+
+        # disabilita ICMP redirect
+        os.system('sudo sysctl -w net.ipv4.conf.all.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.all.send_redirects=0')
+
+        # default
+        os.system('sudo sysctl -w net.ipv4.conf.default.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.default.send_redirects=0')
+
+        # dev wlan
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+'.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.'+wlan+'.send_redirects=0')
+
+        # lo
+        os.system('sudo sysctl -w net.ipv4.conf.lo.accept_redirects=0')
+        os.system('sudo sysctl -w net.ipv4.conf.lo.send_redirects=0')
+
+        print 'hostB!'
+        file = open("configured.txt", "w")
+        file.write("host")
+
     else:
         print '****************** reset configuration *************************'
         file = open("configured.txt", "w")
