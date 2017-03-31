@@ -340,16 +340,33 @@ else:
 
         # sono un client / superclient / server
         # hanno le medesime funzioni
-        if str(configured) == "client":
-            print "boh"
+        if str(configured) == "host":
+            print '6) quagga OFF'
+            print '7) quagga ON'
+            print '8) network OFF'
+            print '9) network ON'
 
             try:
                 option1 = raw_input()
             except SyntaxError:
                 option = None
 
-            if option1 == '1':
-                print ""
+            if option1 == '6':
+                os.system("sudo /etc/init.d/quagga stop")
+                print "quagga service STOP!"
+
+            elif option1 == '7':
+                os.system("sudo /etc/init.d/quagga restart")
+                print "quagga service START!"
+
+            elif option1 == '8':
+                os.system('sudo ifconfig ' + wlan + ' off')
+                print wlan + " service OFF!"
+
+            elif option1 == '9':
+                os.system('sudo ifconfig ' + wlan + ' on')
+                print wlan + " service ON!"
+
             else:
                 print '****************** reset configuration *************************'
                 file = open("configured.txt", "w")
@@ -364,16 +381,31 @@ else:
 
         # sono un gateway
         else:
-            print "1) boh"
+            print '6) quagga OFF'
+            print '7) quagga ON'
+            print '8) network OFF'
+            print '9) network ON'
 
             try:
                 option2 = raw_input()
             except SyntaxError:
                 option = None
 
-            # assegnare un mark per una specifica classe data nel punto 1
-            if option2 == '1':
-                print ""
+            if option1 == '6':
+                os.system("sudo /etc/init.d/quagga stop")
+                print "quagga service STOP!"
+
+            elif option1 == '7':
+                os.system("sudo /etc/init.d/quagga restart")
+                print "quagga service START!"
+
+            elif option1 == '8':
+                os.system('sudo ifconfig ' + wlan + ' off')
+                print wlan + " service OFF!"
+
+            elif option1 == '9':
+                os.system('sudo ifconfig ' + wlan + ' on')
+                print wlan + " service ON!"
 
             else:
                 print '****************** reset configuration *************************'
